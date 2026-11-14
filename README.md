@@ -1,35 +1,36 @@
 # BlockWorld
 
-**BlockWorld** is a native Android voxel sandbox prototype written in Kotlin with OpenGL ES 2.0. It is an original project and does not include Minecraft code, textures, or assets.
+BlockWorld is an original Android voxel sandbox prototype built with Kotlin and OpenGL ES 2.0. It does not contain Minecraft source code or assets.
 
-## Current gameplay
-- A procedurally generated 32 × 32 block landscape
-- First-person camera and touch-look
-- On-screen movement pad
-- Break and place blocks
-- A small tree landmark
-- World edits saved locally on the device
-- GitHub Actions workflow that builds and uploads a debug APK
+## Current version: 0.2.0
+
+- Procedural 48 × 48 block terrain
+- First-person camera with multi-touch look controls
+- Virtual movement pad
+- Jump, break and place controls
+- Grass, dirt, stone, wood and leaf blocks
+- Simple tree landmark and a cleared spawn area
+- Local world edits saved between app launches
+- GitHub Actions build for an installable debug APK
 
 ## Touch controls
-- Drag the virtual pad in the lower-left corner to move.
-- Drag on the right side of the screen to look around.
-- Tap **BREAK** to remove the block in front of you.
-- Tap **PLACE** to place a dirt block next to the targeted block.
+
+- **Lower-left area:** drag to walk in the chosen direction.
+- **Right side:** drag to look around.
+- **JUMP:** tap the left-most round button on the right.
+- **BREAK:** tap the middle round button to remove the block under the crosshair.
+- **PLACE:** tap the right-most round button to place a dirt block in the adjacent empty cell.
 
 ## Build an APK
-1. Open the **Actions** tab in this repository.
+
+1. Open the repository's **Actions** tab.
 2. Select **Android APK**.
-3. Press **Run workflow** (or push a commit to `main`).
-4. Open the completed workflow run and download the `BlockWorld-debug` artifact.
-5. Extract the ZIP and install the APK on an Android device.
+3. Press **Run workflow**, or push a commit to `main`.
+4. Open the completed run and download **BlockWorld-debug-v0.2.0** from Artifacts.
+5. Extract the ZIP and install `app-debug.apk` on your Android device.
 
-The workflow uses JDK 17 and Gradle 8.9. The app targets Android 7.0 (API 24) and newer devices with OpenGL ES 2.0.
+Requirements: Android 7.0 (API 24) or newer and OpenGL ES 2.0 support.
 
-## Source layout
-- `app/src/main/java/dev/mukhalkiv/blockworld/MainActivity.kt` — activity, touch input and HUD
-- `app/src/main/java/dev/mukhalkiv/blockworld/WorldRenderer.kt` — world generation, rendering and block interactions
-- `app/src/main/AndroidManifest.xml` — Android application configuration
-- `.github/workflows/android.yml` — APK build workflow
+## Important
 
-This is an early playable foundation. Chunk streaming, inventory, crafting, mobs, sound and multiplayer are not implemented yet.
+This is still an early sandbox foundation. It does not yet include chunk streaming, an inventory/crafting system, mobs, audio, multiplayer, or a full survival mode.
