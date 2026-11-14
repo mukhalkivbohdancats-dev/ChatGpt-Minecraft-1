@@ -19,6 +19,15 @@ import kotlin.math.roundToInt
 import kotlin.math.sin
 import kotlin.math.sqrt
 
+private fun intFloorDiv(value: Int, divisor: Int): Int {
+    val quotient = value / divisor
+    val remainder = value % divisor
+    return if (remainder != 0 && (value xor divisor) < 0) quotient - 1 else quotient
+}
+
+private fun intFloorMod(value: Int, divisor: Int): Int =
+    value - intFloorDiv(value, divisor) * divisor
+
 private const val BIOME_DESERT = 0
 private const val BIOME_PLAINS = 1
 private const val BIOME_FOREST = 2
@@ -235,8 +244,8 @@ class WorldRenderer(
         lastFrameNanos = now
 
         if (!paused && initializedWorld) updatePlayer(dt)
-        val cx = Math.floorDiv(floor(playerX).toInt(), VoxelChunk.SIZE)
-        val cz = floorDiv(floor(playerZ).toInt(), VoxelChunk.SIZE)
+        val cx = intFloorDiv(floor(playerX).toInt(), VoxelChunk.SIZE)
+        val cz = intFloorDiv(floor(playerZ).toInt(), VoxelChunk.SIZE)
         if (cx != currentChunkX || cz != currentChunkZ) ensureChunksAroundPlayer()
 
         for ((key, chunk) in chunks) {
@@ -453,8 +462,8 @@ class WorldRenderer(
     }
 
     private fun ensureChunksAroundPlayer() {
-        val centerX = floorDiv(floor(playerX).toInt(), VoxelChunk.SIZE)
-        val centerZ = floorDiv(floor(playerZ).toInt(), VoxelChunk.SIZE)
+        val centerX = intFloorDiv(floor(playerX).toInt(), VoxelChunk.SIZE)
+        val centerZ = intFloorDiv(floor(playerZ).toInt(), VoxelChunk.SIZE)
         currentChunkX = centerX
         currentChunkZ = centerZ
         val radius = renderDistance.coerceIn(1, 3)
@@ -532,10 +541,10 @@ class WorldRenderer(
 
         synchronized(saveLock) {
             for ((pos, type) in savedEdits) {
-                if (floorDiv(pos.x, VoxelChunk.SIZE) == key.x &&
-                    floorDiv(pos.z, VoxelChunk.SIZE) == key.z &&
+                if (intFloorDiv(pos.x, VoxelChunk.SIZE) == key.x &&
+                    intFloorDiv(pos.z, VoxelChunk.SIZE) == key.z &&
                     pos.y in 0 until VoxelChunk.HEIGHT) {
-                    chunk.set(Math.floorMod(pos.x, VoxelChunk.SIZE), pos.y, floorMod(pos.z, VoxelChunk.SIZE), type)
+                    chunk.set(intFloorMod(pos.x, VoxelChunk.SIZE), pos.y, intFloorMod(pos.z, VoxelChunk.SIZE), type)
                 }
             }
         }
@@ -544,17 +553,17 @@ class WorldRenderer(
 
     private fun getBlock(worldX: Int, y: Int, worldZ: Int): Int {
         if (y !in 0 until VoxelChunk.HEIGHT) return BLOCK_AIR
-        val key = ChunkKey(floorDiv(worldX, VoxelChunk.SIZE), floorDiv(worldZ, VoxelChunk.SIZE))
+        val key = ChunkKey(intFloorDiv(worldX, VoxelChunk.SIZE), intFloorDiv(worldZ, VoxelChunk.SIZE))
         val chunk = chunks[key] ?: return BLOCK_AIR
-        return chunk.get(floorMod(worldX, VoxelChunk.SIZE), y, floorMod(worldZ, VoxelChunk.SIZE))
+        return chunk.get(intFloorMod(worldX, VoxelChunk.SIZE), y, intFloorMod(worldZ, VoxelChunk.SIZE))
     }
 
     private fun setBlock(worldX: Int, y: Int, worldZ: Int, type: Int): Boolean {
         if (y !in 0 until VoxelChunk.HEIGHT) return false
-        val key = ChunkKey(floorDiv(worldX, VoxelChunk.SIZE), floorDiv(worldZ, VoxelChunk.SIZE))
+        val key = ChunkKey(intFloorDiv(worldX, VoxelChunk.SIZE), intFloorDiv(worldZ, VoxelChunk.SIZE))
         val chunk = chunks[key] ?: return false
-        val localX = floorMod(worldX, VoxelChunk.SIZE)
-        val localZ = floorMod(worldZ, VoxelChunk.SIZE)
+        val localX = intFloorMod(worldX, VoxelChunk.SIZE)
+        val localZ = intFloorMod(worldZ, VoxelChunk.SIZE)
         if (chunk.get(localX, y, localZ) == type) return false
         chunk.set(localX, y, localZ, type)
         synchronized(saveLock) { savedEdits[BlockPos(worldX, y, worldZ)] = type }
@@ -662,9 +671,9 @@ class WorldRenderer(
     private fun oreAt(x: Int, y: Int, z: Int): Int? {
         fun vein(type: Int, minY: Int, maxY: Int, chance: Float): Boolean {
             if (y !in minY..maxY) return false
-            val cellX = floorDiv(x, 4)
-            val cellY = floorDiv(y, 3)
-            val cellZ = floorDiv(z, 4)
+            val cellX = intFloorDiv(x, 4)
+            val cellY = intFloorDiv(y, 3)
+            val cellZ = intFloorDiv(z, 4)
             val seedSalt = worldSeed + type * 9_731L
             val cluster = random01(cellX + cellY * 17, cellZ - cellY * 11, seedSalt)
             val shape = random01(x + y * 31, z - y * 19, seedSalt + 1L)
